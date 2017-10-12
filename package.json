@@ -1,6 +1,6 @@
 {
   "name": "grunt-image-autoresize",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Auto-resize images larger than a certain size",
   "main": "grunt-image-autoresize.js",
   "scripts": {
