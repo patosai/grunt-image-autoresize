@@ -1,0 +1,23 @@
+{
+  "name": "grunt-image-autoresize",
+  "version": "0.0.1",
+  "description": "Auto-resize images larger than a certain size",
+  "main": "grunt-image-autoresize.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/patosai/grunt-image-autoresize.git"
+  },
+  "author": "Patrick Tsai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/patosai/grunt-image-autoresize/issues"
+  },
+  "homepage": "https://github.com/patosai/grunt-image-autoresize#readme",
+  "dependencies": {
+    "gm": "^1.23.0",
+    "promise": "^8.0.1"
+  }
+}
