@@ -45,20 +45,23 @@ module.exports = function(grunt) {
     var completePromise = Promise.resolve();
 
     fileObjectArray.forEach(function(fileObject) {
+      grunt.log.debug('Starting new files target')
+
       var fileList = grunt.file.expand(fileObject, fileObject.src);
 
       for (var ii = 0; ii < fileList.length; ii += BATCH_SIZE) {
-        var fileSlice = fileList.slice(ii, ii + BATCH_SIZE);
+        completePromise = (function(batch) {
+          return completePromise.then(function() {
+            grunt.log.debug('Parsing files: ' + batch.join(', '))
+            var filePromises = batch.map(function(filename) {
+              var filePath = path.join(fileObject.cwd, filename);
+              var outputPath = path.join(fileObject.dest || fileObject.cwd, filename);
+              return parseImage(filePath, maxdimension, outputPath);
+            });
 
-        completePromise = completePromise.then(function() {
-          var filePromises = fileSlice.map(function(filename) {
-            var filePath = path.join(fileObject.cwd, filename);
-            var outputPath = path.join(fileObject.dest || fileObject.cwd, filename);
-            return parseImage(filePath, maxdimension, outputPath);
+            return Promise.all(filePromises);
           });
-
-          return Promise.all(filePromises);
-        });
+        })(fileList.slice(ii, ii + BATCH_SIZE));
       }
     });
 
