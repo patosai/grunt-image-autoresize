@@ -9,6 +9,9 @@ The default max dimension is 800 pixels and can be changed. With the default opt
 
 This uses ImageMagick, so it requires ImageMagick to be installed. Thus this only supports images supported by ImageMagick.
 
+## Installation
+`npm install grunt-image-autoresize`
+
 ## Config
 ```javascript
 grunt.initConfig({

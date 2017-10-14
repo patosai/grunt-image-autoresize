@@ -1,5 +1,7 @@
 // uses gm, promise
 
+'use strict';
+
 var gm = require('gm').subClass({imageMagick: true});
 var path = require('path');
 
@@ -35,6 +37,17 @@ function parseImage(imagePath, maxdimension, outputPath) {
   })
 }
 
+function processImageBatch(filenameArray, maxdimension, filePath, outputPath) {
+  grunt.log.debug('Parsing files: ' + filenameArray.join(', '))
+  var filePromises = filenameArray.map(function(filename) {
+    var filePath = path.join(fileObject.cwd, filename);
+    var outputPath = path.join(fileObject.dest || fileObject.cwd, filename);
+    return parseImage(filePath, maxdimension, outputPath);
+  });
+
+  return Promise.all(filePromises);
+}
+
 module.exports = function(grunt) {
   grunt.registerMultiTask('image_autoresize', 'Auto-resize images larger than a certain size', function() {
     var done = this.async();
@@ -42,30 +55,29 @@ module.exports = function(grunt) {
     var maxdimension = this.data.maxdimension || DEFAULT_MAX_DIMENSION_PX;
     var fileObjectArray = this.data.files;
 
+    var numFilesProcessed = 0;
     var completePromise = Promise.resolve();
 
     fileObjectArray.forEach(function(fileObject) {
       grunt.log.debug('Starting new files target')
 
       var fileList = grunt.file.expand(fileObject, fileObject.src);
+      numFilesProcessed += fileList.length;
 
       for (var ii = 0; ii < fileList.length; ii += BATCH_SIZE) {
-        completePromise = (function(batch) {
+        var fileListSlice = fileList.slice(ii, ii + BATCH_SIZE);
+        completePromise = (function(filenameArray) {
+          var filePath = fileObject.cwd;
+          var outputPath = fileObject.dest || fileObject.cwd;
           return completePromise.then(function() {
-            grunt.log.debug('Parsing files: ' + batch.join(', '))
-            var filePromises = batch.map(function(filename) {
-              var filePath = path.join(fileObject.cwd, filename);
-              var outputPath = path.join(fileObject.dest || fileObject.cwd, filename);
-              return parseImage(filePath, maxdimension, outputPath);
-            });
-
-            return Promise.all(filePromises);
+            processImageBatch(filenameArray, maxdimension, filePath, outputPath);
           });
-        })(fileList.slice(ii, ii + BATCH_SIZE));
+        })(fileListSlice);
       }
     });
 
     completePromise.then(function() {
+      grunt.log.ok(`${numFilesProcessed} images processed`);
       done();
     }).catch(function(err) {
       done(err);
