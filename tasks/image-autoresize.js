@@ -1,6 +1,7 @@
 // uses gm, promise
 
 var gm = require('gm').subClass({imageMagick: true});
+var mkdirp = require('mkdirp');
 var path = require('path');
 
 var Promise = require('promise');
@@ -24,13 +25,22 @@ function parseImage(imagePath, maxdimension, outputPath) {
         image.resize(null, maxdimension)
       }
 
-      image.write(outputPath, function(err) {
+      var dirname = path.dirname(outputPath);
+      mkdirp(dirname, function(err) {
         if (err) {
           reject(err);
           return;
         }
-        resolve();
-      });
+
+        image.write(outputPath, function(err) {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve();
+        });
+      })
+
     })
   })
 }

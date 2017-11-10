@@ -18,6 +18,7 @@
   "homepage": "https://github.com/patosai/grunt-image-autoresize#readme",
   "dependencies": {
     "gm": "^1.23.0",
+    "mkdirp": "^0.5.1",
     "promise": "^8.0.1"
   }
 }
